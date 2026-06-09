@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using WarrantySystem.API.Models.Dtos;
+using WarrantySystem.API.Models.Dtos.Clients;
 using WarrantySystem.API.Models.Entities;
 
 namespace WarrantySystem.API.Controllers
@@ -17,24 +19,57 @@ namespace WarrantySystem.API.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Client>> GetAll()
         {
-            return Ok(_clients);
+            var clientsDto = _clients.Select(request => new ClientResponseDto
+            {
+                Id = request.Id,
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                Email = request.Email,
+                PhoneNumber = request.PhoneNumber,
+                Address = request.Address,
+                CreatedDate = request.CreatedDate,
+                UpdatedDate = request.UpdatedDate
+            });
+
+            return Ok(clientsDto);
         }
 
         [HttpGet]
         [Route("{id}")]
-        public ActionResult<Client> GetById(int id)
+        public ActionResult<ClientResponseDto> GetById(int id)
         {
-            var client = _clients.FirstOrDefault(c => c.Id == id);
-            if (client == null)
+            var request = _clients.FirstOrDefault(c => c.Id == id);
+
+            if (request == null)
             {
                 return NotFound();
             }
-            return Ok(client);
+
+            var clientDto = new ClientResponseDto
+            {
+                Id = request.Id,
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                Email = request.Email,
+                PhoneNumber = request.PhoneNumber,
+                Address = request.Address,
+                CreatedDate = request.CreatedDate,
+                UpdatedDate = request.UpdatedDate
+            };
+            return Ok(clientDto);
         }
 
         [HttpPost]
-        public ActionResult Create(Client client)
+        public ActionResult Create(CreateClientDto request)
         {
+            var client = new Client
+            {
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                Email = request.Email,
+                PhoneNumber = request.PhoneNumber,
+                Address = request.Address
+            };
             client.Id = _clients.Max(c => c.Id) + 1;
             client.CreatedDate = DateTime.UtcNow;
             _clients.Add(client);
@@ -43,18 +78,18 @@ namespace WarrantySystem.API.Controllers
 
         [HttpPut]
         [Route("{id}")]
-        public ActionResult Update(int id, Client updatedClient)
+        public ActionResult Update(int id, UpdatedClientDto request)
         {
             var client = _clients.FirstOrDefault(c => c.Id == id);
             if (client == null)
             {
                 return NotFound();
-            }
-            client.FirstName = updatedClient.FirstName;
-            client.LastName = updatedClient.LastName;
-            client.Email = updatedClient.Email;
-            client.PhoneNumber = updatedClient.PhoneNumber;
-            client.Address = updatedClient.Address;
+            }           
+            client.FirstName = request.FirstName;
+            client.LastName = request.LastName;
+            client.Email = request.Email;
+            client.PhoneNumber = request.PhoneNumber;
+            client.Address = request.Address;
             client.UpdatedDate = DateTime.UtcNow;
             return NoContent();
         }
