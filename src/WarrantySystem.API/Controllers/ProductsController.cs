@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using WarrantySystem.API.Models.Dtos.Clients;
+using WarrantySystem.API.Models.Dtos.Products;
 using WarrantySystem.API.Models.Entities;
 
 namespace WarrantySystem.API.Controllers
@@ -9,32 +11,69 @@ namespace WarrantySystem.API.Controllers
     {
         public static List<Product> _products = new List<Product>
         {
-            new Product{ Id = 1, SerialNumber = "SN001", Brand = "Brand1", Model = "Model1", CreatedDate = DateTime.UtcNow },
-            new Product{ Id = 2, SerialNumber = "SN002", Brand = "Brand2", Model = "Model2", CreatedDate = DateTime.UtcNow },
-            new Product{ Id = 3, SerialNumber = "SN003", Brand = "Brand3", Model = "Model3", CreatedDate = DateTime.UtcNow }
+            new Product{ Id = 1, Name = "Product1", SerialNumber = "SN001", Brand = "Brand1", Model = "Model1", CreatedDate = DateTime.UtcNow },
+            new Product{ Id = 2, Name = "Product2", SerialNumber = "SN002", Brand = "Brand2", Model = "Model2", CreatedDate = DateTime.UtcNow },
+            new Product{ Id = 3, Name = "Product3", SerialNumber = "SN003", Brand = "Brand3", Model = "Model3", CreatedDate = DateTime.UtcNow }
         };
 
         [HttpGet]
-        public ActionResult<IEnumerable<Product>> GetAll()
+        public ActionResult<IEnumerable<ProductResponseDto>> GetAll()
         {
-            return Ok(_products);
+            var productsDto = _products.Select(request => new ProductResponseDto
+            {
+                Id = request.Id,
+                ClientId = request.ClientId,
+                Name = request.Name,
+                SerialNumber = request.SerialNumber,
+                Brand = request.Brand,
+                Model = request.Model,
+                PurchaseDate = request.PurchaseDate,
+                CreatedDate = request.CreatedDate,
+                UpdatedDate = request.UpdatedDate
+            });
+            return Ok(productsDto);
         }
 
         [HttpGet]
         [Route("{id}")]
-        public ActionResult<Product> GetById(int id)
+        public ActionResult<ProductResponseDto> GetById(int id)
         {
-            var product = _products.FirstOrDefault(p => p.Id == id);
-            if (product == null)
+            var request = _products.FirstOrDefault(p => p.Id == id);
+
+            if (request == null)
             {
                 return NotFound();
             }
-            return Ok(product);
+
+            var productDto = new ProductResponseDto
+            {
+                Id = request.Id,
+                ClientId = request.ClientId,
+                Name = request.Name,
+                SerialNumber = request.SerialNumber,
+                Brand = request.Brand,
+                Model = request.Model,
+                PurchaseDate = request.PurchaseDate,
+                CreatedDate = request.CreatedDate,
+                UpdatedDate = request.UpdatedDate
+            };
+
+            return Ok(productDto);
         }
 
         [HttpPost]
-        public ActionResult Create(Product product)
+        public ActionResult Create(CreateProductDto request)
         {
+            var product  = new Product
+            {
+                ClientId = request.ClientId,
+                Name = request.Name,
+                SerialNumber = request.SerialNumber,
+                Brand = request.Brand,
+                Model = request.Model,
+                PurchaseDate = request.PurchaseDate
+            };
+
             product.Id = _products.Max(p => p.Id) + 1;
             product.CreatedDate = DateTime.UtcNow;
             _products.Add(product);
@@ -43,18 +82,18 @@ namespace WarrantySystem.API.Controllers
 
         [HttpPut]
         [Route("{id}")]
-        public ActionResult Update(int id, Product updatedProduct)
+        public ActionResult Update(int id, UpdateProductDto request)
         {
             var product = _products.FirstOrDefault(p => p.Id == id);
             if (product == null)
             {
                 return NotFound();
             }
-            product.SerialNumber = updatedProduct.SerialNumber;
-            product.ClientId = updatedProduct.ClientId;
-            product.Brand = updatedProduct.Brand;
-            product.Model = updatedProduct.Model;
-            product.PurchaseDate = updatedProduct.PurchaseDate;
+            product.SerialNumber = request.SerialNumber;
+            product.ClientId = request.ClientId;
+            product.Brand = request.Brand;
+            product.Model = request.Model;
+            product.PurchaseDate = request.PurchaseDate;
             product.UpdatedDate = DateTime.UtcNow;
             return NoContent();
         }
