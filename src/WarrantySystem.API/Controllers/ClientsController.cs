@@ -17,7 +17,7 @@ namespace WarrantySystem.API.Controllers
         };
 
         [HttpGet]
-        public ActionResult<IEnumerable<Client>> GetAll()
+        public ActionResult<IEnumerable<ClientResponseDto>> GetAll()
         {
             var clientsDto = _clients.Select(request => new ClientResponseDto
             {
