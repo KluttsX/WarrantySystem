@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using WarrantySystem.API.Models.Dtos.Claims;
+using WarrantySystem.API.Models.Dtos.Warranties;
 using WarrantySystem.API.Models.Entities;
 
 namespace WarrantySystem.API.Controllers
@@ -15,26 +17,63 @@ namespace WarrantySystem.API.Controllers
         };
 
         [HttpGet]
-        public ActionResult<IEnumerable<Claim>> GetAll()
+        public ActionResult<IEnumerable<ClaimResponseDto>> GetAll()
         {
-            return Ok(_claims);
+            var claimsDto = _claims.Select(request => new ClaimResponseDto
+            {
+                Id = request.Id,
+                WarrantyId = request.WarrantyId,
+                ClaimDate = request.ClaimDate,
+                IssueDescription = request.IssueDescription,
+                Status = request.Status,
+                ResolutionDate = request.ResolutionDate,
+                ResolutionDetails = request.ResolutionDetails,
+                CreatedDate = request.CreatedDate,
+                UpdatedDate = request.UpdatedDate
+            });
+            return Ok(claimsDto);
         }
 
         [HttpGet]
         [Route("{id}")]
         public ActionResult<Claim> GetById(int id)
         {
-            var claim = _claims.FirstOrDefault(c => c.Id == id);
-            if (claim == null)
+
+            var request = _claims.FirstOrDefault(c => c.Id == id);
+
+            if (request == null)
             {
                 return NotFound();
             }
-            return Ok(claim);
+
+            var claimDto = new ClaimResponseDto
+            {
+                Id = request.Id,
+                WarrantyId = request.WarrantyId,
+                ClaimDate = request.ClaimDate,
+                IssueDescription = request.IssueDescription,
+                Status = request.Status,
+                ResolutionDate = request.ResolutionDate,
+                ResolutionDetails = request.ResolutionDetails,
+                CreatedDate = request.CreatedDate,
+                UpdatedDate = request.UpdatedDate
+            };
+
+            return Ok(claimDto);
         }
 
         [HttpPost]
-        public ActionResult<Claim> Create(Claim claim)
+        public ActionResult Create(CreateClaimDto request)
         {
+            var claim = new Claim
+            {
+                WarrantyId = request.WarrantyId,
+                ClaimDate = request.ClaimDate,
+                IssueDescription = request.IssueDescription,
+                Status = request.Status,
+                ResolutionDate = request.ResolutionDate,
+                ResolutionDetails = request.ResolutionDetails
+            };
             claim.Id = _claims.Max(c => c.Id) + 1;
             claim.CreatedDate = DateTime.UtcNow;
             _claims.Add(claim);
@@ -43,19 +82,19 @@ namespace WarrantySystem.API.Controllers
 
         [HttpPut]
         [Route("{id}")]
-        public ActionResult Update(int id, Claim updatedClaim)
+        public ActionResult Update(int id, UpdateClaimDto request)
         {
             var claim = _claims.FirstOrDefault(c => c.Id == id);
             if (claim == null)
             {
                 return NotFound();
             }
-            claim.WarrantyId = updatedClaim.WarrantyId;
-            claim.ClaimDate = updatedClaim.ClaimDate;
-            claim.IssueDescription = updatedClaim.IssueDescription;
-            claim.Status = updatedClaim.Status;
-            claim.ResolutionDate = updatedClaim.ResolutionDate;
-            claim.ResolutionDetails = updatedClaim.ResolutionDetails;
+            claim.WarrantyId = request.WarrantyId;
+            claim.ClaimDate = request.ClaimDate;
+            claim.IssueDescription = request.IssueDescription;
+            claim.Status = request.Status;
+            claim.ResolutionDate = request.ResolutionDate;
+            claim.ResolutionDetails = request.ResolutionDetails;
             claim.UpdatedDate = DateTime.UtcNow;
             return NoContent();
         }
