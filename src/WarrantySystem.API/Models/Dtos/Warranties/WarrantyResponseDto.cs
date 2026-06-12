@@ -1,6 +1,6 @@
-﻿namespace WarrantySystem.API.Models.Entities
+﻿namespace WarrantySystem.API.Models.Dtos.Warranties
 {
-    public class Warranty
+    public class WarrantyResponseDto
     {
         public int Id { get; set; }
         public int ProductId { get; set; }

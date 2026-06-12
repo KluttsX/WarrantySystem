@@ -1,14 +1,11 @@
-﻿namespace WarrantySystem.API.Models.Entities
+﻿namespace WarrantySystem.API.Models.Dtos.Warranties
 {
-    public class Warranty
+    public class CreateWarrantyDto
     {
-        public int Id { get; set; }
         public int ProductId { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public string Status { get; set; } = string.Empty;
         public string TermsAndConditions { get; set; } = string.Empty;
-        public DateTime CreatedDate { get; set; }
-        public DateTime? UpdatedDate { get; set; }
     }
 }

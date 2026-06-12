@@ -1,6 +1,6 @@
 ﻿namespace WarrantySystem.API.Models.Dtos.Clients
 {
-    public class UpdatedClientDto
+    public class UpdateClientDto
     {
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
