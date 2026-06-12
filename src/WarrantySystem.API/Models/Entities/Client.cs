@@ -10,5 +10,6 @@
         public string? Address { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
+        public ICollection<Product> Products { get; set; } = new List<Product>();
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace WarrantySystem.API.Models.Dtos.Claims
+﻿using WarrantySystem.API.Models.Dtos.Warranties;
+
+namespace WarrantySystem.API.Models.Dtos.Claims
 {
     public class ClaimResponseDto
     {
@@ -11,5 +13,6 @@
         public string? ResolutionDetails { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
+        public WarrantyResponseDto? Warranty { get; set; }
     }
 }

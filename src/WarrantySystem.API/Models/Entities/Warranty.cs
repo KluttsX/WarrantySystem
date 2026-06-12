@@ -10,5 +10,7 @@
         public string TermsAndConditions { get; set; } = string.Empty;
         public DateTime CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
+        public Product? Product { get; set; }
+        public ICollection<Claim> Claims { get; set; } = new List<Claim>();
     }
 }

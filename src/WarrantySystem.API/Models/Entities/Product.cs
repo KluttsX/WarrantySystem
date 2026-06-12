@@ -11,5 +11,7 @@
         public DateTime? PurchaseDate { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
+        public Client? Client { get; set; }
+        public ICollection<Warranty> Warranties { get; set; } = new List<Warranty>();
     }
 }
