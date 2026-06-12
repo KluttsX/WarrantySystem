@@ -78,7 +78,7 @@ namespace WarrantySystem.API.Controllers
 
         [HttpPut]
         [Route("{id}")]
-        public ActionResult Update(int id, UpdatedClientDto request)
+        public ActionResult Update(int id, UpdateClientDto request)
         {
             var client = _clients.FirstOrDefault(c => c.Id == id);
             if (client == null)

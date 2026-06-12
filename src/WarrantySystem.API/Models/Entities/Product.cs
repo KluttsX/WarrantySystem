@@ -3,7 +3,7 @@
     public class Product
     {
         public int Id { get; set; }
-        public string? ClientId { get; set; }
+        public int? ClientId { get; set; }
         public string Name { get; set; } = string.Empty;
         public string SerialNumber { get; set; } = string.Empty;
         public string Brand { get; set; } = string.Empty;
