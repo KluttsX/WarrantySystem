@@ -11,6 +11,6 @@
         public string? ResolutionDetails { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
-
+        public Warranty? Warranty { get; set; }
     }
 }

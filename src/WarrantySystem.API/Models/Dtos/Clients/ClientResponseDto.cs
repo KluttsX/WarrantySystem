@@ -1,4 +1,6 @@
-﻿namespace WarrantySystem.API.Models.Dtos.Clients
+﻿using WarrantySystem.API.Models.Dtos.Products;
+
+namespace WarrantySystem.API.Models.Dtos.Clients
 {
     public class ClientResponseDto
     {
@@ -10,5 +12,6 @@
         public string? Address { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
+        public ICollection<ProductResponseDto>? Products { get; set; }
     }
 }
