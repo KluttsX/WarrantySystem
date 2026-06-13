@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using WarrantySystem.API.Data;
 using WarrantySystem.API.Models.Dtos.Products;
 using WarrantySystem.API.Models.Dtos.Warranties;
 using WarrantySystem.API.Models.Entities;
@@ -9,16 +10,19 @@ namespace WarrantySystem.API.Controllers
     [Route("api/[controller]")]
     public class WarrantiesController : ControllerBase
     {
-        public static List<Warranty> _warranties = new List<Warranty>
+
+        private readonly ApplicationDbContext _context;
+
+        public WarrantiesController(ApplicationDbContext dbContext)
         {
-            new Warranty { Id = 1, ProductId = 1, StartDate = DateTime.UtcNow.AddMonths(-6), EndDate = DateTime.UtcNow.AddMonths(6), Status = "Active", TermsAndConditions = "Standard warranty terms apply.", CreatedDate = DateTime.UtcNow },
-            new Warranty { Id = 2, ProductId = 2, StartDate = DateTime.UtcNow.AddMonths(-12), EndDate = DateTime.UtcNow.AddMonths(12), Status = "Active", TermsAndConditions = "Extended warranty terms apply.", CreatedDate = DateTime.UtcNow },
-            new Warranty { Id = 3, ProductId = 3, StartDate = DateTime.UtcNow.AddMonths(-18), EndDate = DateTime.UtcNow.AddMonths(18), Status = "Expired", TermsAndConditions = "Expired warranty terms apply.", CreatedDate = DateTime.UtcNow }
-        };
+            _context = dbContext;
+        }
 
         [HttpGet]
         public ActionResult<IEnumerable<WarrantyResponseDto>> GetAll()
         {
+            var _warranties = _context.Warranties.ToList();
+
             var warrantiesDto = _warranties.Select(request => new WarrantyResponseDto
             {
                 Id = request.Id,
@@ -30,6 +34,7 @@ namespace WarrantySystem.API.Controllers
                 CreatedDate = request.CreatedDate,
                 UpdatedDate = request.UpdatedDate
             });
+
             return Ok(warrantiesDto);
         }
 
@@ -37,7 +42,8 @@ namespace WarrantySystem.API.Controllers
         [Route("{id}")]
         public ActionResult<WarrantyResponseDto> GetById(int id)
         {
-            var request = _warranties.FirstOrDefault(w => w.Id == id);
+            var request = _context.Warranties.
+                FirstOrDefault(w => w.Id == id);
 
             if (request == null)
             {
@@ -60,7 +66,7 @@ namespace WarrantySystem.API.Controllers
         }
 
         [HttpPost]
-        public ActionResult Create(CreateWarrantyDto request)
+        public ActionResult<int> Create(CreateWarrantyDto request)
         {
             var warranty = new Warranty
             {
@@ -69,28 +75,37 @@ namespace WarrantySystem.API.Controllers
                 EndDate = request.EndDate,
                 Status = request.Status,
                 TermsAndConditions = request.TermsAndConditions,
+                CreatedDate = DateTime.Now,
             };
-            warranty.Id = _warranties.Max(w => w.Id) + 1;
-            warranty.CreatedDate = DateTime.UtcNow;
-            _warranties.Add(warranty);
-            return CreatedAtAction(nameof(GetById), new { id = warranty.Id }, warranty);
+
+            _context.Warranties.Add(warranty);
+            _context.SaveChanges();
+
+            return Ok(new { Id = warranty.Id });
         }
 
         [HttpPut]
         [Route("{id}")]
         public ActionResult Update(int id, UpdateWarrantyDto request)
         {
-            var warranty = _warranties.FirstOrDefault(w => w.Id == id);
+            var warranty = _context.Warranties.
+                FirstOrDefault(w => w.Id == id);
+
             if (warranty == null)
             {
                 return NotFound();
             }
+
             warranty.ProductId = request.ProductId;
             warranty.StartDate = request.StartDate;
             warranty.EndDate = request.EndDate;
             warranty.Status = request.Status;
             warranty.TermsAndConditions = request.TermsAndConditions;
             warranty.UpdatedDate = DateTime.UtcNow;
+
+            _context.Warranties.Update(warranty);
+            _context.SaveChanges();
+
             return NoContent();
         }
 
@@ -98,12 +113,17 @@ namespace WarrantySystem.API.Controllers
         [Route("{id}")]
         public ActionResult Delete(int id)
         {
-            var warranty = _warranties.FirstOrDefault(w => w.Id == id);
+            var warranty = _context.Warranties.
+                FirstOrDefault(w => w.Id == id);
+
             if (warranty == null)
             {
                 return NotFound();
             }
-            _warranties.Remove(warranty);
+
+            _context.Warranties.Remove(warranty);
+            _context.SaveChanges();
+
             return NoContent();
         }
     }

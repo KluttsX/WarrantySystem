@@ -13,7 +13,5 @@ namespace WarrantySystem.API.Models.Dtos.Warranties
         public string TermsAndConditions { get; set; } = string.Empty;
         public DateTime CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
-        public ProductResponseDto? Product { get; set; }
-        public ICollection<ClaimResponseDto>? Claims { get; set; }
     }
 }

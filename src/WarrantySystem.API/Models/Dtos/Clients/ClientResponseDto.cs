@@ -12,6 +12,5 @@ namespace WarrantySystem.API.Models.Dtos.Clients
         public string? Address { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
-        public ICollection<ProductResponseDto>? Products { get; set; }
     }
 }
