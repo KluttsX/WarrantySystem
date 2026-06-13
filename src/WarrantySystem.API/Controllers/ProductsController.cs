@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using WarrantySystem.API.Data;
 using WarrantySystem.API.Models.Dtos.Clients;
 using WarrantySystem.API.Models.Dtos.Products;
 using WarrantySystem.API.Models.Entities;
@@ -9,16 +10,18 @@ namespace WarrantySystem.API.Controllers
     [Route("api/[controller]")]
     public class ProductsController : ControllerBase
     {
-        public static List<Product> _products = new List<Product>
+        private readonly ApplicationDbContext _context;
+
+        public ProductsController(ApplicationDbContext dbContext)
         {
-            new Product{ Id = 1, Name = "Product1", SerialNumber = "SN001", Brand = "Brand1", Model = "Model1", CreatedDate = DateTime.UtcNow },
-            new Product{ Id = 2, Name = "Product2", SerialNumber = "SN002", Brand = "Brand2", Model = "Model2", CreatedDate = DateTime.UtcNow },
-            new Product{ Id = 3, Name = "Product3", SerialNumber = "SN003", Brand = "Brand3", Model = "Model3", CreatedDate = DateTime.UtcNow }
-        };
+            _context = dbContext;
+        }
 
         [HttpGet]
         public ActionResult<IEnumerable<ProductResponseDto>> GetAll()
         {
+            var _products = _context.Products.ToList();
+
             var productsDto = _products.Select(request => new ProductResponseDto
             {
                 Id = request.Id,
@@ -31,6 +34,7 @@ namespace WarrantySystem.API.Controllers
                 CreatedDate = request.CreatedDate,
                 UpdatedDate = request.UpdatedDate
             });
+
             return Ok(productsDto);
         }
 
@@ -38,7 +42,7 @@ namespace WarrantySystem.API.Controllers
         [Route("{id}")]
         public ActionResult<ProductResponseDto> GetById(int id)
         {
-            var request = _products.FirstOrDefault(p => p.Id == id);
+            var request = _context.Products.FirstOrDefault(p => p.Id == id);
 
             if (request == null)
             {
@@ -62,39 +66,47 @@ namespace WarrantySystem.API.Controllers
         }
 
         [HttpPost]
-        public ActionResult Create(CreateProductDto request)
+        public ActionResult<int> Create(CreateProductDto request)
         {
-            var product  = new Product
+            var product = new Product
             {
                 ClientId = request.ClientId,
                 Name = request.Name,
                 SerialNumber = request.SerialNumber,
                 Brand = request.Brand,
                 Model = request.Model,
-                PurchaseDate = request.PurchaseDate
+                PurchaseDate = request.PurchaseDate,
+                CreatedDate = DateTime.UtcNow
             };
 
-            product.Id = _products.Max(p => p.Id) + 1;
-            product.CreatedDate = DateTime.UtcNow;
-            _products.Add(product);
-            return CreatedAtAction(nameof(GetById), new { id = product.Id }, product);
+            _context.Products.Add(product);
+            _context.SaveChanges();
+
+            return Ok(new { Id = product.Id });
         }
 
         [HttpPut]
         [Route("{id}")]
         public ActionResult Update(int id, UpdateProductDto request)
         {
-            var product = _products.FirstOrDefault(p => p.Id == id);
+            var product = _context.Products
+                .FirstOrDefault(p => p.Id == id);
+
             if (product == null)
             {
                 return NotFound();
             }
+
             product.SerialNumber = request.SerialNumber;
             product.ClientId = request.ClientId;
             product.Brand = request.Brand;
             product.Model = request.Model;
             product.PurchaseDate = request.PurchaseDate;
             product.UpdatedDate = DateTime.UtcNow;
+
+            _context.Products.Update(product);
+            _context.SaveChanges();
+
             return NoContent();
         }
 
@@ -102,12 +114,17 @@ namespace WarrantySystem.API.Controllers
         [Route("{id}")]
         public ActionResult Delete(int id)
         {
-            var product = _products.FirstOrDefault(p => p.Id == id);
+            var product = _context.Products.
+                FirstOrDefault(p => p.Id == id);
+
             if (product == null)
             {
                 return NotFound();
             }
-            _products.Remove(product);
+
+            _context.Products.Remove(product);
+            _context.SaveChanges();
+
             return NoContent();
         }
     }

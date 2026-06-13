@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using WarrantySystem.API.Data;
 using WarrantySystem.API.Models.Dtos;
 using WarrantySystem.API.Models.Dtos.Clients;
 using WarrantySystem.API.Models.Entities;
@@ -9,16 +10,18 @@ namespace WarrantySystem.API.Controllers
     [Route("api/[controller]")]
     public class ClientsController : ControllerBase
     {
-        public static List<Client> _clients = new List<Client>
+        private readonly ApplicationDbContext _context;
+
+        public ClientsController(ApplicationDbContext dbContext)
         {
-            new Client { Id = 1, FirstName = "John", LastName = "Doe", Email = "john.doe@example.com", PhoneNumber = "123-456-7890", Address = "123 Main St, Anytown, USA", CreatedDate = DateTime.UtcNow, UpdatedDate = null },
-            new Client { Id = 2, FirstName = "Jane", LastName = "Smith", Email = "jane.smith@example.com", PhoneNumber = "098-765-4321", Address = "456 Oak Ave, Somewhere, USA", CreatedDate = DateTime.UtcNow, UpdatedDate = null },
-            new Client { Id = 3, FirstName = "Alice", LastName = "Johnson", Email = "alice.johnson@example.com", PhoneNumber = "555-555-5555", Address = "789 Pine Rd, Elsewhere, USA", CreatedDate = DateTime.UtcNow, UpdatedDate = null }
-        };
+            _context = dbContext;
+        }
 
         [HttpGet]
         public ActionResult<IEnumerable<ClientResponseDto>> GetAll()
         {
+            var _clients = _context.Clients.ToList();
+
             var clientsDto = _clients.Select(request => new ClientResponseDto
             {
                 Id = request.Id,
@@ -38,7 +41,8 @@ namespace WarrantySystem.API.Controllers
         [Route("{id}")]
         public ActionResult<ClientResponseDto> GetById(int id)
         {
-            var request = _clients.FirstOrDefault(c => c.Id == id);
+            var request = _context.Clients.
+                FirstOrDefault(c => c.Id == id);
 
             if (request == null)
             {
@@ -56,11 +60,12 @@ namespace WarrantySystem.API.Controllers
                 CreatedDate = request.CreatedDate,
                 UpdatedDate = request.UpdatedDate
             };
+
             return Ok(clientDto);
         }
 
         [HttpPost]
-        public ActionResult Create(CreateClientDto request)
+        public ActionResult<int> Create(CreateClientDto request)
         {
             var client = new Client
             {
@@ -68,29 +73,38 @@ namespace WarrantySystem.API.Controllers
                 LastName = request.LastName,
                 Email = request.Email,
                 PhoneNumber = request.PhoneNumber,
-                Address = request.Address
+                Address = request.Address,
+                CreatedDate = DateTime.UtcNow
             };
-            client.Id = _clients.Max(c => c.Id) + 1;
-            client.CreatedDate = DateTime.UtcNow;
-            _clients.Add(client);
-            return CreatedAtAction(nameof(GetById), new { id = client.Id }, client);
+
+            _context.Clients.Add(client);
+            _context.SaveChanges();
+
+            return Ok(new { Id = client.Id });
         }
 
         [HttpPut]
         [Route("{id}")]
         public ActionResult Update(int id, UpdateClientDto request)
         {
-            var client = _clients.FirstOrDefault(c => c.Id == id);
+            var client = _context.Clients.
+                FirstOrDefault(c => c.Id == id);
+
             if (client == null)
             {
                 return NotFound();
-            }           
+            }
+
             client.FirstName = request.FirstName;
             client.LastName = request.LastName;
             client.Email = request.Email;
             client.PhoneNumber = request.PhoneNumber;
             client.Address = request.Address;
             client.UpdatedDate = DateTime.UtcNow;
+
+            _context.Clients.Update(client);
+            _context.SaveChanges();
+
             return NoContent();
         }
 
@@ -98,12 +112,17 @@ namespace WarrantySystem.API.Controllers
         [Route("{id}")]
         public ActionResult Delete(int id)
         {
-            var client = _clients.FirstOrDefault(c => c.Id == id);
+            var client = _context.Clients.
+                FirstOrDefault(c => c.Id == id);
+
             if (client == null)
             {
                 return NotFound();
             }
-            _clients.Remove(client);
+
+            _context.Clients.Remove(client);
+            _context.SaveChanges();
+
             return NoContent();
         }
     }
