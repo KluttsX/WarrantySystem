@@ -8,19 +8,17 @@ namespace WarrantySystem.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ClientsController : ControllerBase
+    public class ClientsController : BaseController
     {
-        private readonly ApplicationDbContext _context;
 
-        public ClientsController(ApplicationDbContext dbContext)
+        public ClientsController(ApplicationDbContext dataContext) : base(dataContext)
         {
-            _context = dbContext;
         }
 
         [HttpGet]
         public ActionResult<IEnumerable<ClientResponseDto>> GetAll()
         {
-            var _clients = _context.Clients.ToList();
+            var _clients = Context.Clients.ToList();
 
             var clientsDto = _clients.Select(request => new ClientResponseDto
             {
@@ -41,7 +39,7 @@ namespace WarrantySystem.API.Controllers
         [Route("{id}")]
         public ActionResult<ClientResponseDto> GetById(int id)
         {
-            var request = _context.Clients.
+            var request = Context.Clients.
                 FirstOrDefault(c => c.Id == id);
 
             if (request == null)
@@ -77,8 +75,8 @@ namespace WarrantySystem.API.Controllers
                 CreatedDate = DateTime.UtcNow
             };
 
-            _context.Clients.Add(client);
-            _context.SaveChanges();
+            Context.Clients.Add(client);
+            Context.SaveChanges();
 
             return Ok(new { Id = client.Id });
         }
@@ -87,7 +85,7 @@ namespace WarrantySystem.API.Controllers
         [Route("{id}")]
         public ActionResult Update(int id, UpdateClientDto request)
         {
-            var client = _context.Clients.
+            var client = Context.Clients.
                 FirstOrDefault(c => c.Id == id);
 
             if (client == null)
@@ -102,8 +100,8 @@ namespace WarrantySystem.API.Controllers
             client.Address = request.Address;
             client.UpdatedDate = DateTime.UtcNow;
 
-            _context.Clients.Update(client);
-            _context.SaveChanges();
+            Context.Clients.Update(client);
+            Context.SaveChanges();
 
             return NoContent();
         }
@@ -112,7 +110,7 @@ namespace WarrantySystem.API.Controllers
         [Route("{id}")]
         public ActionResult Delete(int id)
         {
-            var client = _context.Clients.
+            var client = Context.Clients.
                 FirstOrDefault(c => c.Id == id);
 
             if (client == null)
@@ -120,8 +118,8 @@ namespace WarrantySystem.API.Controllers
                 return NotFound();
             }
 
-            _context.Clients.Remove(client);
-            _context.SaveChanges();
+            Context.Clients.Remove(client);
+            Context.SaveChanges();
 
             return NoContent();
         }

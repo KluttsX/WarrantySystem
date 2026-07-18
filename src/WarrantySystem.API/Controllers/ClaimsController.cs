@@ -8,19 +8,17 @@ namespace WarrantySystem.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ClaimsController : ControllerBase
+    public class ClaimsController : BaseController
     {
-        private readonly ApplicationDbContext _context;
 
-        public ClaimsController(ApplicationDbContext dbContext)
+        public ClaimsController(ApplicationDbContext dataContext) : base(dataContext)
         {
-            _context = dbContext;
         }
 
         [HttpGet]
         public ActionResult<IEnumerable<ClaimResponseDto>> GetAll()
         {
-            var _claims = _context.Claims.ToList();
+            var _claims = Context.Claims.ToList();
 
             var claimsDto = _claims.Select(request => new ClaimResponseDto
             {
@@ -40,10 +38,10 @@ namespace WarrantySystem.API.Controllers
 
         [HttpGet]
         [Route("{id}")]
-        public ActionResult<Claim> GetById(int id)
+        public ActionResult<ClaimResponseDto> GetById(int id)
         {
 
-            var request = _context.Claims.
+            var request = Context.Claims.
                 FirstOrDefault(c => c.Id == id);
 
             if (request == null)
@@ -81,8 +79,8 @@ namespace WarrantySystem.API.Controllers
                 CreatedDate = DateTime.UtcNow
             };
 
-            _context.Claims.Add(claim);
-            _context.SaveChanges();
+            Context.Claims.Add(claim);
+            Context.SaveChanges();
 
             return Ok(new { Id = claim.Id });
         }
@@ -91,7 +89,7 @@ namespace WarrantySystem.API.Controllers
         [Route("{id}")]
         public ActionResult Update(int id, UpdateClaimDto request)
         {
-            var claim = _context.Claims.FirstOrDefault(c => c.Id == id);
+            var claim = Context.Claims.FirstOrDefault(c => c.Id == id);
 
             if (claim == null)
             {
@@ -106,8 +104,8 @@ namespace WarrantySystem.API.Controllers
             claim.ResolutionDetails = request.ResolutionDetails;
             claim.UpdatedDate = DateTime.UtcNow;
 
-            _context.Claims.Update(claim);
-            _context.SaveChanges();
+            Context.Claims.Update(claim);
+            Context.SaveChanges();
 
             return NoContent();
         }
@@ -116,15 +114,15 @@ namespace WarrantySystem.API.Controllers
         [Route("{id}")]
         public ActionResult Delete(int id)
         {
-            var claim = _context.Claims.FirstOrDefault(c => c.Id == id);
+            var claim = Context.Claims.FirstOrDefault(c => c.Id == id);
 
             if (claim == null)
             {
                 return NotFound();
             }
 
-            _context.Claims.Remove(claim);
-            _context.SaveChanges();
+            Context.Claims.Remove(claim);
+            Context.SaveChanges();
 
             return NoContent();
         }

@@ -8,19 +8,17 @@ namespace WarrantySystem.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ProductsController : ControllerBase
+    public class ProductsController : BaseController
     {
-        private readonly ApplicationDbContext _context;
 
-        public ProductsController(ApplicationDbContext dbContext)
+        public ProductsController(ApplicationDbContext dataContext) : base(dataContext)
         {
-            _context = dbContext;
         }
 
         [HttpGet]
         public ActionResult<IEnumerable<ProductResponseDto>> GetAll()
         {
-            var _products = _context.Products.ToList();
+            var _products = Context.Products.ToList();
 
             var productsDto = _products.Select(request => new ProductResponseDto
             {
@@ -42,7 +40,7 @@ namespace WarrantySystem.API.Controllers
         [Route("{id}")]
         public ActionResult<ProductResponseDto> GetById(int id)
         {
-            var request = _context.Products.FirstOrDefault(p => p.Id == id);
+            var request = Context.Products.FirstOrDefault(p => p.Id == id);
 
             if (request == null)
             {
@@ -79,8 +77,8 @@ namespace WarrantySystem.API.Controllers
                 CreatedDate = DateTime.UtcNow
             };
 
-            _context.Products.Add(product);
-            _context.SaveChanges();
+            Context.Products.Add(product);
+            Context.SaveChanges();
 
             return Ok(new { Id = product.Id });
         }
@@ -89,7 +87,7 @@ namespace WarrantySystem.API.Controllers
         [Route("{id}")]
         public ActionResult Update(int id, UpdateProductDto request)
         {
-            var product = _context.Products
+            var product = Context.Products
                 .FirstOrDefault(p => p.Id == id);
 
             if (product == null)
@@ -104,8 +102,8 @@ namespace WarrantySystem.API.Controllers
             product.PurchaseDate = request.PurchaseDate;
             product.UpdatedDate = DateTime.UtcNow;
 
-            _context.Products.Update(product);
-            _context.SaveChanges();
+            Context.Products.Update(product);
+            Context.SaveChanges();
 
             return NoContent();
         }
@@ -114,7 +112,7 @@ namespace WarrantySystem.API.Controllers
         [Route("{id}")]
         public ActionResult Delete(int id)
         {
-            var product = _context.Products.
+            var product = Context.Products.
                 FirstOrDefault(p => p.Id == id);
 
             if (product == null)
@@ -122,8 +120,8 @@ namespace WarrantySystem.API.Controllers
                 return NotFound();
             }
 
-            _context.Products.Remove(product);
-            _context.SaveChanges();
+            Context.Products.Remove(product);
+            Context.SaveChanges();
 
             return NoContent();
         }
