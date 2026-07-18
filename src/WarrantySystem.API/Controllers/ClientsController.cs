@@ -1,93 +1,62 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using WarrantySystem.API.Data;
-using WarrantySystem.API.Models.Dtos;
 using WarrantySystem.API.Models.Dtos.Clients;
 using WarrantySystem.API.Models.Entities;
+using WarrantySystem.API.Models.Responses;
 
 namespace WarrantySystem.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ClientsController : ControllerBase
+    public class ClientsController : BaseController
     {
-        private readonly ApplicationDbContext _context;
 
-        public ClientsController(ApplicationDbContext dbContext)
+        public ClientsController(ApplicationDbContext dataContext, IMapper mapper) : base(dataContext, mapper)
         {
-            _context = dbContext;
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<ClientResponseDto>> GetAll()
+        public ApiResponse<IEnumerable<ClientResponseDto>> GetAll()
         {
-            var _clients = _context.Clients.ToList();
+            var _clients = Context.Clients.ToList();
 
-            var clientsDto = _clients.Select(request => new ClientResponseDto
-            {
-                Id = request.Id,
-                FirstName = request.FirstName,
-                LastName = request.LastName,
-                Email = request.Email,
-                PhoneNumber = request.PhoneNumber,
-                Address = request.Address,
-                CreatedDate = request.CreatedDate,
-                UpdatedDate = request.UpdatedDate
-            });
-
-            return Ok(clientsDto);
+            return ApiResponse<IEnumerable<ClientResponseDto>>
+                .SuccessResponse(Mapper.Map<List<ClientResponseDto>>(_clients));
         }
 
         [HttpGet]
         [Route("{id}")]
-        public ActionResult<ClientResponseDto> GetById(int id)
+        public ApiResponse<ClientResponseDto> GetById(int id)
         {
-            var request = _context.Clients.
+            var request = Context.Clients.
                 FirstOrDefault(c => c.Id == id);
 
             if (request == null)
             {
-                return NotFound();
+                return ApiResponse<ClientResponseDto>.FailureResponse("Client not found", 404);
             }
 
-            var clientDto = new ClientResponseDto
-            {
-                Id = request.Id,
-                FirstName = request.FirstName,
-                LastName = request.LastName,
-                Email = request.Email,
-                PhoneNumber = request.PhoneNumber,
-                Address = request.Address,
-                CreatedDate = request.CreatedDate,
-                UpdatedDate = request.UpdatedDate
-            };
-
-            return Ok(clientDto);
+            return ApiResponse<ClientResponseDto>
+                .SuccessResponse(Mapper.Map<ClientResponseDto>(request));
         }
 
         [HttpPost]
-        public ActionResult<int> Create(CreateClientDto request)
+        public ApiResponse<int> Create(CreateClientDto request)
         {
-            var client = new Client
-            {
-                FirstName = request.FirstName,
-                LastName = request.LastName,
-                Email = request.Email,
-                PhoneNumber = request.PhoneNumber,
-                Address = request.Address,
-                CreatedDate = DateTime.UtcNow
-            };
+            var client = Mapper.Map<Client>(request);
 
-            _context.Clients.Add(client);
-            _context.SaveChanges();
+            Context.Clients.Add(client);
+            Context.SaveChanges();
 
-            return Ok(new { Id = client.Id });
+            return ApiResponse<int>.SuccessResponse(client.Id);
         }
 
         [HttpPut]
         [Route("{id}")]
         public ActionResult Update(int id, UpdateClientDto request)
         {
-            var client = _context.Clients.
+            var client = Context.Clients.
                 FirstOrDefault(c => c.Id == id);
 
             if (client == null)
@@ -102,8 +71,8 @@ namespace WarrantySystem.API.Controllers
             client.Address = request.Address;
             client.UpdatedDate = DateTime.UtcNow;
 
-            _context.Clients.Update(client);
-            _context.SaveChanges();
+            Context.Clients.Update(client);
+            Context.SaveChanges();
 
             return NoContent();
         }
@@ -112,7 +81,7 @@ namespace WarrantySystem.API.Controllers
         [Route("{id}")]
         public ActionResult Delete(int id)
         {
-            var client = _context.Clients.
+            var client = Context.Clients.
                 FirstOrDefault(c => c.Id == id);
 
             if (client == null)
@@ -120,8 +89,8 @@ namespace WarrantySystem.API.Controllers
                 return NotFound();
             }
 
-            _context.Clients.Remove(client);
-            _context.SaveChanges();
+            Context.Clients.Remove(client);
+            Context.SaveChanges();
 
             return NoContent();
         }
