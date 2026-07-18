@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="WarrantySystem.API/WarrantySystem.API.csproj" />
   <Project Path="WarrantySystem.Domain/WarrantySystem.Domain.csproj" Id="724e9d1f-50cd-449e-9381-ca6382c147da" />
+  <Project Path="WarrantySystem.Infraestructure/WarrantySystem.Infraestructure.csproj" Id="0b5377be-8e47-4ea7-bb9a-7e9df5744325" />
 </Solution>

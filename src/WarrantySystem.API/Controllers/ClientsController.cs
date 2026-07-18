@@ -1,9 +1,10 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using WarrantySystem.API.Data;
+using WarrantySystem.Infraestructure.Context;
 using WarrantySystem.API.Models.Dtos.Clients;
 using WarrantySystem.API.Models.Responses;
 using WarrantySystem.Domain.Entities;
+using WarrantySystem.Infraestructure.Repositories;
 
 namespace WarrantySystem.API.Controllers
 {
@@ -11,15 +12,19 @@ namespace WarrantySystem.API.Controllers
     [Route("api/[controller]")]
     public class ClientsController : BaseController
     {
+        private readonly UnitOfWork _unitOfWork;
 
-        public ClientsController(ApplicationDbContext dataContext, IMapper mapper) : base(dataContext, mapper)
+        public ClientsController(IMapper mapper, 
+            UnitOfWork unitOfWork
+            ) : base(mapper)
         {
+            this._unitOfWork = unitOfWork;
         }
 
         [HttpGet]
         public ApiResponse<IEnumerable<ClientResponseDto>> GetAll()
         {
-            var _clients = Context.Clients.ToList();
+            var _clients = _unitOfWork.Client.GetAll();
 
             return ApiResponse<IEnumerable<ClientResponseDto>>
                 .SuccessResponse(Mapper.Map<List<ClientResponseDto>>(_clients));
@@ -29,8 +34,7 @@ namespace WarrantySystem.API.Controllers
         [Route("{id}")]
         public ApiResponse<ClientResponseDto> GetById(int id)
         {
-            var request = Context.Clients.
-                FirstOrDefault(c => c.Id == id);
+            var request = _unitOfWork.Client.GetById(id);
 
             if (request == null)
             {
@@ -46,8 +50,8 @@ namespace WarrantySystem.API.Controllers
         {
             var client = Mapper.Map<Client>(request);
 
-            Context.Clients.Add(client);
-            Context.SaveChanges();
+            _unitOfWork.Client.Create(client);
+            _unitOfWork.Complete();
 
             return ApiResponse<int>.SuccessResponse(client.Id);
         }
@@ -56,8 +60,7 @@ namespace WarrantySystem.API.Controllers
         [Route("{id}")]
         public ActionResult Update(int id, UpdateClientDto request)
         {
-            var client = Context.Clients.
-                FirstOrDefault(c => c.Id == id);
+            var client = _unitOfWork.Client.GetById(id);
 
             if (client == null)
             {
@@ -71,8 +74,8 @@ namespace WarrantySystem.API.Controllers
             client.Address = request.Address;
             client.UpdatedDate = DateTime.UtcNow;
 
-            Context.Clients.Update(client);
-            Context.SaveChanges();
+            _unitOfWork.Client.Update(client);
+            _unitOfWork.Complete();
 
             return NoContent();
         }
@@ -81,16 +84,15 @@ namespace WarrantySystem.API.Controllers
         [Route("{id}")]
         public ActionResult Delete(int id)
         {
-            var client = Context.Clients.
-                FirstOrDefault(c => c.Id == id);
+            var client = _unitOfWork.Client.GetById(id);
 
             if (client == null)
             {
                 return NotFound();
             }
 
-            Context.Clients.Remove(client);
-            Context.SaveChanges();
+            _unitOfWork.Client.Delete(client);
+            _unitOfWork.Complete();
 
             return NoContent();
         }

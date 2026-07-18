@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using WarrantySystem.API.Data;
+using WarrantySystem.Infraestructure.Context;
 
 #nullable disable
 
-namespace WarrantySystem.API.Migrations
+namespace WarrantySystem.Infraestructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
@@ -22,7 +22,7 @@ namespace WarrantySystem.API.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("WarrantySystem.API.Models.Entities.Claim", b =>
+            modelBuilder.Entity("WarrantySystem.Domain.Entities.Claim", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -63,7 +63,7 @@ namespace WarrantySystem.API.Migrations
                     b.ToTable("Claims");
                 });
 
-            modelBuilder.Entity("WarrantySystem.API.Models.Entities.Client", b =>
+            modelBuilder.Entity("WarrantySystem.Domain.Entities.Client", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -100,7 +100,7 @@ namespace WarrantySystem.API.Migrations
                     b.ToTable("Clients");
                 });
 
-            modelBuilder.Entity("WarrantySystem.API.Models.Entities.Product", b =>
+            modelBuilder.Entity("WarrantySystem.Domain.Entities.Product", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -143,7 +143,7 @@ namespace WarrantySystem.API.Migrations
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("WarrantySystem.API.Models.Entities.Warranty", b =>
+            modelBuilder.Entity("WarrantySystem.Domain.Entities.Warranty", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -181,9 +181,9 @@ namespace WarrantySystem.API.Migrations
                     b.ToTable("Warranties");
                 });
 
-            modelBuilder.Entity("WarrantySystem.API.Models.Entities.Claim", b =>
+            modelBuilder.Entity("WarrantySystem.Domain.Entities.Claim", b =>
                 {
-                    b.HasOne("WarrantySystem.API.Models.Entities.Warranty", "Warranty")
+                    b.HasOne("WarrantySystem.Domain.Entities.Warranty", "Warranty")
                         .WithMany("Claims")
                         .HasForeignKey("WarrantyId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -192,18 +192,18 @@ namespace WarrantySystem.API.Migrations
                     b.Navigation("Warranty");
                 });
 
-            modelBuilder.Entity("WarrantySystem.API.Models.Entities.Product", b =>
+            modelBuilder.Entity("WarrantySystem.Domain.Entities.Product", b =>
                 {
-                    b.HasOne("WarrantySystem.API.Models.Entities.Client", "Client")
+                    b.HasOne("WarrantySystem.Domain.Entities.Client", "Client")
                         .WithMany("Products")
                         .HasForeignKey("ClientId");
 
                     b.Navigation("Client");
                 });
 
-            modelBuilder.Entity("WarrantySystem.API.Models.Entities.Warranty", b =>
+            modelBuilder.Entity("WarrantySystem.Domain.Entities.Warranty", b =>
                 {
-                    b.HasOne("WarrantySystem.API.Models.Entities.Product", "Product")
+                    b.HasOne("WarrantySystem.Domain.Entities.Product", "Product")
                         .WithMany("Warranties")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -212,17 +212,17 @@ namespace WarrantySystem.API.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("WarrantySystem.API.Models.Entities.Client", b =>
+            modelBuilder.Entity("WarrantySystem.Domain.Entities.Client", b =>
                 {
                     b.Navigation("Products");
                 });
 
-            modelBuilder.Entity("WarrantySystem.API.Models.Entities.Product", b =>
+            modelBuilder.Entity("WarrantySystem.Domain.Entities.Product", b =>
                 {
                     b.Navigation("Warranties");
                 });
 
-            modelBuilder.Entity("WarrantySystem.API.Models.Entities.Warranty", b =>
+            modelBuilder.Entity("WarrantySystem.Domain.Entities.Warranty", b =>
                 {
                     b.Navigation("Claims");
                 });

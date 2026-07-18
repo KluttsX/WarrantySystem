@@ -1,10 +1,9 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using WarrantySystem.API.Data;
-using WarrantySystem.API.Models.Dtos.Products;
 using WarrantySystem.API.Models.Dtos.Warranties;
 using WarrantySystem.API.Models.Responses;
 using WarrantySystem.Domain.Entities;
+using WarrantySystem.Infraestructure.Repositories;
 
 namespace WarrantySystem.API.Controllers
 {
@@ -12,16 +11,19 @@ namespace WarrantySystem.API.Controllers
     [Route("api/[controller]")]
     public class WarrantiesController : BaseController
     {
+        private readonly UnitOfWork _unitOfWork;
 
-
-        public WarrantiesController(ApplicationDbContext dataContext, IMapper mapper) : base(dataContext, mapper)
+        public WarrantiesController(IMapper mapper,
+            UnitOfWork unitOfWork
+            ) : base(mapper)
         {
+            this._unitOfWork = unitOfWork;
         }
 
         [HttpGet]
         public ApiResponse<IEnumerable<WarrantyResponseDto>> GetAll()
         {
-            var _warranties = Context.Warranties.ToList();
+            var _warranties = _unitOfWork.Warranty.GetAll();
 
             return ApiResponse<IEnumerable<WarrantyResponseDto>>
                 .SuccessResponse(Mapper.Map<List<WarrantyResponseDto>>(_warranties));
@@ -31,8 +33,7 @@ namespace WarrantySystem.API.Controllers
         [Route("{id}")]
         public ApiResponse<WarrantyResponseDto> GetById(int id)
         {
-            var request = Context.Warranties.
-                FirstOrDefault(w => w.Id == id);
+            var request = _unitOfWork.Warranty.GetById(id);
 
             if (request == null)
             {
@@ -48,8 +49,8 @@ namespace WarrantySystem.API.Controllers
         {
             var warranty = Mapper.Map<Warranty>(request);
 
-            Context.Warranties.Add(warranty);
-            Context.SaveChanges();
+            _unitOfWork.Warranty.Create(warranty);
+            _unitOfWork.Complete();
 
             return ApiResponse<int>.SuccessResponse(warranty.Id);
         }
@@ -58,8 +59,7 @@ namespace WarrantySystem.API.Controllers
         [Route("{id}")]
         public ActionResult Update(int id, UpdateWarrantyDto request)
         {
-            var warranty = Context.Warranties.
-                FirstOrDefault(w => w.Id == id);
+            var warranty = _unitOfWork.Warranty.GetById(id);
 
             if (warranty == null)
             {
@@ -73,8 +73,8 @@ namespace WarrantySystem.API.Controllers
             warranty.TermsAndConditions = request.TermsAndConditions;
             warranty.UpdatedDate = DateTime.UtcNow;
 
-            Context.Warranties.Update(warranty);
-            Context.SaveChanges();
+            _unitOfWork.Warranty.Update(warranty);
+            _unitOfWork.Complete();
 
             return NoContent();
         }
@@ -83,16 +83,15 @@ namespace WarrantySystem.API.Controllers
         [Route("{id}")]
         public ActionResult Delete(int id)
         {
-            var warranty = Context.Warranties.
-                FirstOrDefault(w => w.Id == id);
+            var warranty = _unitOfWork.Warranty.GetById(id);
 
             if (warranty == null)
             {
                 return NotFound();
             }
 
-            Context.Warranties.Remove(warranty);
-            Context.SaveChanges();
+            _unitOfWork.Warranty.Delete(warranty);
+            _unitOfWork.Complete();
 
             return NoContent();
         }
