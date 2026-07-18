@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using WarrantySystem.API.Models.Entities;
+using WarrantySystem.Domain.Entities;
 
 namespace WarrantySystem.API.Data
 {

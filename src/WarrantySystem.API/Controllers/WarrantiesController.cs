@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using WarrantySystem.API.Data;
 using WarrantySystem.API.Models.Dtos.Products;
 using WarrantySystem.API.Models.Dtos.Warranties;
-using WarrantySystem.API.Models.Entities;
 using WarrantySystem.API.Models.Responses;
+using WarrantySystem.Domain.Entities;
 
 namespace WarrantySystem.API.Controllers
 {
