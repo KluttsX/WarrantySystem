@@ -10,6 +10,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+//var automapperLicense = builder.Configuration.GetSection("KeysConfiguration:AutomapperLicenseKey").Value;
+
+//builder.Services.AddAutoMapper(cfg => cfg.LicenseKey = automapperLicense, typeof(MappingProfile));
+
 var app = builder.Build();
 
 app.UseHttpsRedirection();
