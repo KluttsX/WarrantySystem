@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using WarrantySystem.API.Data;
 using WarrantySystem.API.Models.Dtos.Clients;
 using WarrantySystem.API.Models.Dtos.Products;
 using WarrantySystem.API.Models.Entities;
+using WarrantySystem.API.Models.Responses;
 
 namespace WarrantySystem.API.Controllers
 {
@@ -11,76 +13,43 @@ namespace WarrantySystem.API.Controllers
     public class ProductsController : BaseController
     {
 
-        public ProductsController(ApplicationDbContext dataContext) : base(dataContext)
+        public ProductsController(ApplicationDbContext dataContext, IMapper mapper) : base(dataContext, mapper)
         {
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<ProductResponseDto>> GetAll()
+        public ApiResponse<IEnumerable<ProductResponseDto>> GetAll()
         {
             var _products = Context.Products.ToList();
 
-            var productsDto = _products.Select(request => new ProductResponseDto
-            {
-                Id = request.Id,
-                ClientId = request.ClientId,
-                Name = request.Name,
-                SerialNumber = request.SerialNumber,
-                Brand = request.Brand,
-                Model = request.Model,
-                PurchaseDate = request.PurchaseDate,
-                CreatedDate = request.CreatedDate,
-                UpdatedDate = request.UpdatedDate
-            });
-
-            return Ok(productsDto);
+            return ApiResponse<IEnumerable<ProductResponseDto>>
+                .SuccessResponse(Mapper.Map<List<ProductResponseDto>>(_products));
         }
 
         [HttpGet]
         [Route("{id}")]
-        public ActionResult<ProductResponseDto> GetById(int id)
+        public ApiResponse<ProductResponseDto> GetById(int id)
         {
             var request = Context.Products.FirstOrDefault(p => p.Id == id);
 
             if (request == null)
             {
-                return NotFound();
+                return ApiResponse<ProductResponseDto>.FailureResponse("Product not found", 404);
             }
 
-            var productDto = new ProductResponseDto
-            {
-                Id = request.Id,
-                ClientId = request.ClientId,
-                Name = request.Name,
-                SerialNumber = request.SerialNumber,
-                Brand = request.Brand,
-                Model = request.Model,
-                PurchaseDate = request.PurchaseDate,
-                CreatedDate = request.CreatedDate,
-                UpdatedDate = request.UpdatedDate
-            };
-
-            return Ok(productDto);
+            return ApiResponse<ProductResponseDto>
+                .SuccessResponse(Mapper.Map<ProductResponseDto>(request));
         }
 
         [HttpPost]
-        public ActionResult<int> Create(CreateProductDto request)
+        public ApiResponse<int> Create(CreateProductDto request)
         {
-            var product = new Product
-            {
-                ClientId = request.ClientId,
-                Name = request.Name,
-                SerialNumber = request.SerialNumber,
-                Brand = request.Brand,
-                Model = request.Model,
-                PurchaseDate = request.PurchaseDate,
-                CreatedDate = DateTime.UtcNow
-            };
+            var product = Mapper.Map<Product>(request);
 
             Context.Products.Add(product);
             Context.SaveChanges();
 
-            return Ok(new { Id = product.Id });
+            return ApiResponse<int>.SuccessResponse(product.Id);
         }
 
         [HttpPut]

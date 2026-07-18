@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using WarrantySystem.API.Data;
 using WarrantySystem.API.Models.Dtos.Products;
 using WarrantySystem.API.Models.Dtos.Warranties;
 using WarrantySystem.API.Models.Entities;
+using WarrantySystem.API.Models.Responses;
 
 namespace WarrantySystem.API.Controllers
 {
@@ -12,74 +14,44 @@ namespace WarrantySystem.API.Controllers
     {
 
 
-        public WarrantiesController(ApplicationDbContext dataContext) : base(dataContext)
+        public WarrantiesController(ApplicationDbContext dataContext, IMapper mapper) : base(dataContext, mapper)
         {
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<WarrantyResponseDto>> GetAll()
+        public ApiResponse<IEnumerable<WarrantyResponseDto>> GetAll()
         {
             var _warranties = Context.Warranties.ToList();
 
-            var warrantiesDto = _warranties.Select(request => new WarrantyResponseDto
-            {
-                Id = request.Id,
-                ProductId = request.ProductId,
-                StartDate = request.StartDate,
-                EndDate = request.EndDate,
-                Status = request.Status,
-                TermsAndConditions = request.TermsAndConditions,
-                CreatedDate = request.CreatedDate,
-                UpdatedDate = request.UpdatedDate
-            });
-
-            return Ok(warrantiesDto);
+            return ApiResponse<IEnumerable<WarrantyResponseDto>>
+                .SuccessResponse(Mapper.Map<List<WarrantyResponseDto>>(_warranties));
         }
 
         [HttpGet]
         [Route("{id}")]
-        public ActionResult<WarrantyResponseDto> GetById(int id)
+        public ApiResponse<WarrantyResponseDto> GetById(int id)
         {
             var request = Context.Warranties.
                 FirstOrDefault(w => w.Id == id);
 
             if (request == null)
             {
-                return NotFound();
+                return ApiResponse<WarrantyResponseDto>.FailureResponse("Warranty not found", 404);
             }
 
-            var warrantyDto = new WarrantyResponseDto
-            {
-                Id = request.Id,
-                ProductId = request.ProductId,
-                StartDate = request.StartDate,
-                EndDate = request.EndDate,
-                Status = request.Status,
-                TermsAndConditions = request.TermsAndConditions,
-                CreatedDate = request.CreatedDate,
-                UpdatedDate = request.UpdatedDate
-            };
-
-            return Ok(warrantyDto);
+            return ApiResponse<WarrantyResponseDto>
+                .SuccessResponse(Mapper.Map<WarrantyResponseDto>(request));
         }
 
         [HttpPost]
-        public ActionResult<int> Create(CreateWarrantyDto request)
+        public ApiResponse<int> Create(CreateWarrantyDto request)
         {
-            var warranty = new Warranty
-            {
-                ProductId = request.ProductId,
-                StartDate = request.StartDate,
-                EndDate = request.EndDate,
-                Status = request.Status,
-                TermsAndConditions = request.TermsAndConditions,
-                CreatedDate = DateTime.Now,
-            };
+            var warranty = Mapper.Map<Warranty>(request);
 
             Context.Warranties.Add(warranty);
             Context.SaveChanges();
 
-            return Ok(new { Id = warranty.Id });
+            return ApiResponse<int>.SuccessResponse(warranty.Id);
         }
 
         [HttpPut]

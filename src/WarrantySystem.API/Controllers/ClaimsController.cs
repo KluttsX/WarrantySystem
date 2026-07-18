@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using WarrantySystem.API.Data;
 using WarrantySystem.API.Models.Dtos.Claims;
 using WarrantySystem.API.Models.Dtos.Warranties;
 using WarrantySystem.API.Models.Entities;
+using WarrantySystem.API.Models.Responses;
 
 namespace WarrantySystem.API.Controllers
 {
@@ -11,78 +13,44 @@ namespace WarrantySystem.API.Controllers
     public class ClaimsController : BaseController
     {
 
-        public ClaimsController(ApplicationDbContext dataContext) : base(dataContext)
+        public ClaimsController(ApplicationDbContext dataContext, IMapper mapper) : base(dataContext, mapper)
         {
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<ClaimResponseDto>> GetAll()
+        public ApiResponse<IEnumerable<ClaimResponseDto>> GetAll()
         {
             var _claims = Context.Claims.ToList();
 
-            var claimsDto = _claims.Select(request => new ClaimResponseDto
-            {
-                Id = request.Id,
-                WarrantyId = request.WarrantyId,
-                ClaimDate = request.ClaimDate,
-                IssueDescription = request.IssueDescription,
-                Status = request.Status,
-                ResolutionDate = request.ResolutionDate,
-                ResolutionDetails = request.ResolutionDetails,
-                CreatedDate = request.CreatedDate,
-                UpdatedDate = request.UpdatedDate
-            });
-
-            return Ok(claimsDto);
+            return ApiResponse<IEnumerable<ClaimResponseDto>>
+                .SuccessResponse(Mapper.Map<List<ClaimResponseDto>>(_claims));
         }
 
         [HttpGet]
         [Route("{id}")]
-        public ActionResult<ClaimResponseDto> GetById(int id)
+        public ApiResponse<ClaimResponseDto> GetById(int id)
         {
-
-            var request = Context.Claims.
-                FirstOrDefault(c => c.Id == id);
+            var request = Context.Claims.FirstOrDefault(c => c.Id == id);
 
             if (request == null)
             {
-                return NotFound();
+                return ApiResponse<ClaimResponseDto>.FailureResponse("Claim not found", 404);
             }
 
-            var claimDto = new ClaimResponseDto
-            {
-                Id = request.Id,
-                WarrantyId = request.WarrantyId,
-                ClaimDate = request.ClaimDate,
-                IssueDescription = request.IssueDescription,
-                Status = request.Status,
-                ResolutionDate = request.ResolutionDate,
-                ResolutionDetails = request.ResolutionDetails,
-                CreatedDate = request.CreatedDate,
-                UpdatedDate = request.UpdatedDate
-            };
 
-            return Ok(claimDto);
+            return ApiResponse<ClaimResponseDto>
+                .SuccessResponse(Mapper.Map<ClaimResponseDto>(request));
         }
 
         [HttpPost]
-        public ActionResult<int> Create(CreateClaimDto request)
+        public ApiResponse<int> Create(CreateClaimDto request)
         {
-            var claim = new Claim
-            {
-                WarrantyId = request.WarrantyId,
-                ClaimDate = request.ClaimDate,
-                IssueDescription = request.IssueDescription,
-                Status = request.Status,
-                ResolutionDate = request.ResolutionDate,
-                ResolutionDetails = request.ResolutionDetails,
-                CreatedDate = DateTime.UtcNow
-            };
+            var claim = Mapper.Map<Claim>(request);
 
             Context.Claims.Add(claim);
             Context.SaveChanges();
 
-            return Ok(new { Id = claim.Id });
+            return ApiResponse<int>.SuccessResponse(claim.Id);
         }
 
         [HttpPut]

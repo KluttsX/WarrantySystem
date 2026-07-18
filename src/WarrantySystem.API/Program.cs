@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using WarrantySystem.API.Data;
+using WarrantySystem.API.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,9 +11,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-//var automapperLicense = builder.Configuration.GetSection("KeysConfiguration:AutomapperLicenseKey").Value;
+var automapperLicense = builder.Configuration.GetSection("KeysConfiguration:AutomapperLicenseKey").Value;
 
-//builder.Services.AddAutoMapper(cfg => cfg.LicenseKey = automapperLicense, typeof(MappingProfile));
+builder.Services.AddAutoMapper(cfg => cfg.LicenseKey = automapperLicense, typeof(MappingProfile));
 
 var app = builder.Build();
 
