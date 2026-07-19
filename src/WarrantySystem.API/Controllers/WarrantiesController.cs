@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using WarrantySystem.API.Models.Dtos.Warranties;
-using WarrantySystem.API.Models.Responses;
+using WarrantySystem.Application.Models.Dtos.Warranties;
+using WarrantySystem.Application.Models.Responses;
+using WarrantySystem.Application.Services;
 using WarrantySystem.Domain.Entities;
 using WarrantySystem.Infraestructure.Repositories;
 
@@ -12,70 +13,38 @@ namespace WarrantySystem.API.Controllers
     public class WarrantiesController : BaseController
     {
         private readonly UnitOfWork _unitOfWork;
+        private readonly WarrantiesService _service;
 
         public WarrantiesController(IMapper mapper,
-            UnitOfWork unitOfWork
+            UnitOfWork unitOfWork,
+            WarrantiesService service
             ) : base(mapper)
         {
             this._unitOfWork = unitOfWork;
+            this._service = service;
         }
 
         [HttpGet]
         public ApiResponse<IEnumerable<WarrantyResponseDto>> GetAll()
-        {
-            var _warranties = _unitOfWork.Warranty.GetAll();
-
-            return ApiResponse<IEnumerable<WarrantyResponseDto>>
-                .SuccessResponse(Mapper.Map<List<WarrantyResponseDto>>(_warranties));
-        }
+            => _service.GetAll();
 
         [HttpGet]
         [Route("{id}")]
         public ApiResponse<WarrantyResponseDto> GetById(int id)
-        {
-            var request = _unitOfWork.Warranty.GetById(id);
-
-            if (request == null)
-            {
-                return ApiResponse<WarrantyResponseDto>.FailureResponse("Warranty not found", 404);
-            }
-
-            return ApiResponse<WarrantyResponseDto>
-                .SuccessResponse(Mapper.Map<WarrantyResponseDto>(request));
-        }
+            => _service.GetById(id);
 
         [HttpPost]
         public ApiResponse<int> Create(CreateWarrantyDto request)
-        {
-            var warranty = Mapper.Map<Warranty>(request);
-
-            _unitOfWork.Warranty.Create(warranty);
-            _unitOfWork.Complete();
-
-            return ApiResponse<int>.SuccessResponse(warranty.Id);
-        }
+            => _service.Create(request);
 
         [HttpPut]
         [Route("{id}")]
         public ActionResult Update(int id, UpdateWarrantyDto request)
         {
-            var warranty = _unitOfWork.Warranty.GetById(id);
-
-            if (warranty == null)
+            if (!_service.Update(id, request).Success)
             {
                 return NotFound();
             }
-
-            warranty.ProductId = request.ProductId;
-            warranty.StartDate = request.StartDate;
-            warranty.EndDate = request.EndDate;
-            warranty.Status = request.Status;
-            warranty.TermsAndConditions = request.TermsAndConditions;
-            warranty.UpdatedDate = DateTime.UtcNow;
-
-            _unitOfWork.Warranty.Update(warranty);
-            _unitOfWork.Complete();
-
             return NoContent();
         }
 
@@ -83,17 +52,7 @@ namespace WarrantySystem.API.Controllers
         [Route("{id}")]
         public ActionResult Delete(int id)
         {
-            var warranty = _unitOfWork.Warranty.GetById(id);
-
-            if (warranty == null)
-            {
-                return NotFound();
-            }
-
-            _unitOfWork.Warranty.Delete(warranty);
-            _unitOfWork.Complete();
-
-            return NoContent();
+            return _service.Delete(id).Success ? NoContent() : NotFound();
         }
     }
 }

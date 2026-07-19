@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
-using WarrantySystem.API.Models.Dtos.Claims;
-using WarrantySystem.API.Models.Dtos.Clients;
-using WarrantySystem.API.Models.Dtos.Products;
-using WarrantySystem.API.Models.Dtos.Warranties;
+using WarrantySystem.Application.Models.Dtos.Claims;
+using WarrantySystem.Application.Models.Dtos.Clients;
+using WarrantySystem.Application.Models.Dtos.Products;
+using WarrantySystem.Application.Models.Dtos.Warranties;
 using WarrantySystem.Domain.Entities;
 
-namespace WarrantySystem.API.Models
+namespace WarrantySystem.Application.Models
 {
     public class MappingProfile : Profile
     {

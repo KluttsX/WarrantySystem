@@ -1,6 +1,6 @@
-﻿namespace WarrantySystem.API.Models.Dtos.Products
+﻿namespace WarrantySystem.Application.Models.Dtos.Products
 {
-    public class UpdateProductDto
+    public class CreateProductDto
     {
         public int? ClientId { get; set; }
         public string Name { get; set; } = string.Empty;

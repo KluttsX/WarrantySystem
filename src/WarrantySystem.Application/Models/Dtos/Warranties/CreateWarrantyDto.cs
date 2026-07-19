@@ -1,6 +1,6 @@
-﻿namespace WarrantySystem.API.Models.Dtos.Warranties
+﻿namespace WarrantySystem.Application.Models.Dtos.Warranties
 {
-    public class UpdateWarrantyDto
+    public class CreateWarrantyDto
     {
         public int ProductId { get; set; }
         public DateTime StartDate { get; set; }

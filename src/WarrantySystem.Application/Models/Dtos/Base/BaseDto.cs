@@ -1,4 +1,4 @@
-﻿namespace WarrantySystem.API.Models.Dtos.Base
+﻿namespace WarrantySystem.Application.Models.Dtos.Base
 {
     public class BaseDto
     {

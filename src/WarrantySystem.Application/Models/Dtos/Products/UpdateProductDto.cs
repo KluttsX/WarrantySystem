@@ -1,10 +1,6 @@
-﻿using WarrantySystem.API.Models.Dtos.Base;
-using WarrantySystem.API.Models.Dtos.Clients;
-using WarrantySystem.API.Models.Dtos.Warranties;
-
-namespace WarrantySystem.API.Models.Dtos.Products
+﻿namespace WarrantySystem.Application.Models.Dtos.Products
 {
-    public class ProductResponseDto : BaseDto
+    public class UpdateProductDto
     {
         public int? ClientId { get; set; }
         public string Name { get; set; } = string.Empty;

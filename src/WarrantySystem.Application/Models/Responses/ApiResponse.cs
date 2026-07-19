@@ -1,4 +1,4 @@
-﻿namespace WarrantySystem.API.Models.Responses
+﻿namespace WarrantySystem.Application.Models.Responses
 {
     public class ApiResponse<T>
     {
