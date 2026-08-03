@@ -1,8 +1,8 @@
-﻿using WarrantySystem.API.Models.Dtos.Base;
-using WarrantySystem.API.Models.Dtos.Claims;
-using WarrantySystem.API.Models.Dtos.Products;
+﻿using WarrantySystem.Application.Models.Dtos.Base;
+using WarrantySystem.Application.Models.Dtos.Claims;
+using WarrantySystem.Application.Models.Dtos.Products;
 
-namespace WarrantySystem.API.Models.Dtos.Warranties
+namespace WarrantySystem.Application.Models.Dtos.Warranties
 {
     public class WarrantyResponseDto : BaseDto
     {

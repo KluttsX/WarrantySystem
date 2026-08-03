@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\WarrantySystem.Application\WarrantySystem.Application.csproj" />
     <ProjectReference Include="..\WarrantySystem.Domain\WarrantySystem.Domain.csproj" />
     <ProjectReference Include="..\WarrantySystem.Infraestructure\WarrantySystem.Infraestructure.csproj" />
   </ItemGroup>

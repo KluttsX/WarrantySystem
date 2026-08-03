@@ -1,6 +1,10 @@
-﻿namespace WarrantySystem.API.Models.Dtos.Products
+﻿using WarrantySystem.Application.Models.Dtos.Base;
+using WarrantySystem.Application.Models.Dtos.Clients;
+using WarrantySystem.Application.Models.Dtos.Warranties;
+
+namespace WarrantySystem.Application.Models.Dtos.Products
 {
-    public class CreateProductDto
+    public class ProductResponseDto : BaseDto
     {
         public int? ClientId { get; set; }
         public string Name { get; set; } = string.Empty;

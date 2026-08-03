@@ -1,9 +1,6 @@
-﻿using WarrantySystem.API.Models.Dtos.Base;
-using WarrantySystem.API.Models.Dtos.Warranties;
-
-namespace WarrantySystem.API.Models.Dtos.Claims
+﻿namespace WarrantySystem.Application.Models.Dtos.Claims
 {
-    public class ClaimResponseDto : BaseDto
+    public class CreateClaimDto
     {
         public int WarrantyId { get; set; }
         public DateTime ClaimDate { get; set; }

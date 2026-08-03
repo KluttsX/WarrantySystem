@@ -1,4 +1,4 @@
-﻿namespace WarrantySystem.API.Models.Dtos.Clients
+﻿namespace WarrantySystem.Application.Models.Dtos.Clients
 {
     public class UpdateClientDto
     {
