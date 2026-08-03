@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using WarrantySystem.API.Data;
+using WarrantySystem.Infraestructure.Context;
 using WarrantySystem.API.Models.Dtos.Claims;
-using WarrantySystem.API.Models.Dtos.Warranties;
-using WarrantySystem.API.Models.Entities;
 using WarrantySystem.API.Models.Responses;
+using WarrantySystem.Domain.Entities;
+using WarrantySystem.Infraestructure.Repositories;
 
 namespace WarrantySystem.API.Controllers
 {
@@ -12,15 +12,19 @@ namespace WarrantySystem.API.Controllers
     [Route("api/[controller]")]
     public class ClaimsController : BaseController
     {
+        private readonly UnitOfWork _unitOfWork;
 
-        public ClaimsController(ApplicationDbContext dataContext, IMapper mapper) : base(dataContext, mapper)
+        public ClaimsController(IMapper mapper, 
+            UnitOfWork unitOfWork
+            ) : base(mapper)
         {
+            this._unitOfWork = unitOfWork;
         }
 
         [HttpGet]
         public ApiResponse<IEnumerable<ClaimResponseDto>> GetAll()
         {
-            var _claims = Context.Claims.ToList();
+            var _claims = _unitOfWork.Claim.GetAll();
 
             return ApiResponse<IEnumerable<ClaimResponseDto>>
                 .SuccessResponse(Mapper.Map<List<ClaimResponseDto>>(_claims));
@@ -30,7 +34,7 @@ namespace WarrantySystem.API.Controllers
         [Route("{id}")]
         public ApiResponse<ClaimResponseDto> GetById(int id)
         {
-            var request = Context.Claims.FirstOrDefault(c => c.Id == id);
+            var request = _unitOfWork.Claim.GetById(id);
 
             if (request == null)
             {
@@ -47,8 +51,8 @@ namespace WarrantySystem.API.Controllers
         {
             var claim = Mapper.Map<Claim>(request);
 
-            Context.Claims.Add(claim);
-            Context.SaveChanges();
+            _unitOfWork.Claim.Create(claim);
+            _unitOfWork.Complete();
 
             return ApiResponse<int>.SuccessResponse(claim.Id);
         }
@@ -57,7 +61,7 @@ namespace WarrantySystem.API.Controllers
         [Route("{id}")]
         public ActionResult Update(int id, UpdateClaimDto request)
         {
-            var claim = Context.Claims.FirstOrDefault(c => c.Id == id);
+            var claim = _unitOfWork.Claim.GetById(id);
 
             if (claim == null)
             {
@@ -72,8 +76,8 @@ namespace WarrantySystem.API.Controllers
             claim.ResolutionDetails = request.ResolutionDetails;
             claim.UpdatedDate = DateTime.UtcNow;
 
-            Context.Claims.Update(claim);
-            Context.SaveChanges();
+            _unitOfWork.Claim.Update(claim);
+            _unitOfWork.Complete();
 
             return NoContent();
         }
@@ -82,15 +86,15 @@ namespace WarrantySystem.API.Controllers
         [Route("{id}")]
         public ActionResult Delete(int id)
         {
-            var claim = Context.Claims.FirstOrDefault(c => c.Id == id);
+            var claim = _unitOfWork.Claim.GetById(id);
 
             if (claim == null)
             {
                 return NotFound();
             }
 
-            Context.Claims.Remove(claim);
-            Context.SaveChanges();
+            _unitOfWork.Claim.Delete(claim);
+            _unitOfWork.Complete();
 
             return NoContent();
         }

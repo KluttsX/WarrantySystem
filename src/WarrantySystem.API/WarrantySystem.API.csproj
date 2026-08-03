@@ -23,4 +23,9 @@
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.2.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\WarrantySystem.Domain\WarrantySystem.Domain.csproj" />
+    <ProjectReference Include="..\WarrantySystem.Infraestructure\WarrantySystem.Infraestructure.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -3,7 +3,7 @@ using WarrantySystem.API.Models.Dtos.Claims;
 using WarrantySystem.API.Models.Dtos.Clients;
 using WarrantySystem.API.Models.Dtos.Products;
 using WarrantySystem.API.Models.Dtos.Warranties;
-using WarrantySystem.API.Models.Entities;
+using WarrantySystem.Domain.Entities;
 
 namespace WarrantySystem.API.Models
 {

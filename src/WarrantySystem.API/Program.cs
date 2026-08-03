@@ -1,6 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using WarrantySystem.API.Data;
 using WarrantySystem.API.Models;
+using WarrantySystem.Domain.Entities;
+using WarrantySystem.Infraestructure.Core;
+using WarrantySystem.Infraestructure.Context;
+using WarrantySystem.Infraestructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +17,12 @@ builder.Services.AddSwaggerGen();
 var automapperLicense = builder.Configuration.GetSection("KeysConfiguration:AutomapperLicenseKey").Value;
 
 builder.Services.AddAutoMapper(cfg => cfg.LicenseKey = automapperLicense, typeof(MappingProfile));
+
+builder.Services.AddScoped<GenericRepository<Warranty>>();
+builder.Services.AddScoped<ClaimRepository>();
+builder.Services.AddScoped<ClientRepository>();
+builder.Services.AddScoped<ProductRepository>();
+builder.Services.AddScoped<UnitOfWork>();
 
 var app = builder.Build();
 
