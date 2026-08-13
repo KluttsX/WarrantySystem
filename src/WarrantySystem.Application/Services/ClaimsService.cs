@@ -42,6 +42,8 @@ namespace WarrantySystem.Application.Services
         {
             var claim = _mapper.Map<Claim>(request);
 
+            claim.CreatedDate = DateTime.UtcNow;
+
             _unitOfWork.Claim.Create(claim);
             _unitOfWork.Complete();
 

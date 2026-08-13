@@ -42,6 +42,8 @@ namespace WarrantySystem.Application.Services
         {
             var warranty = _mapper.Map<Warranty>(request);
 
+            warranty.CreatedDate = DateTime.UtcNow;
+
             _unitOfWork.Warranty.Create(warranty);
             _unitOfWork.Complete();
 

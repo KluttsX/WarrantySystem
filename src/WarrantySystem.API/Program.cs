@@ -31,10 +31,21 @@ builder.Services.AddScoped<ClientsService>();
 builder.Services.AddScoped<ProductsService>();
 builder.Services.AddScoped<WarrantiesService>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontEnd", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 
 var app = builder.Build();
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowFrontEnd");
 
 app.UseAuthorization();
 

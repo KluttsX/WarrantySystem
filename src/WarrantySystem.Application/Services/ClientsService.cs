@@ -42,6 +42,8 @@ namespace WarrantySystem.Application.Services
         {
             var client = _mapper.Map<Client>(request);
 
+            client.CreatedDate = DateTime.UtcNow;
+
             _unitOfWork.Client.Create(client);
             _unitOfWork.Complete();
 
