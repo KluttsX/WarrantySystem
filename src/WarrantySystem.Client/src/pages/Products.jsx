@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { getAll, create, remove, update } from "../services/productService";
+import { getAll as getClients } from "../services/clientService";
 
 const formatDate = (dateString) => {
   if (!dateString || dateString === "0001-01-01T00:00:00") return "Pendiente";
@@ -24,6 +25,7 @@ const formatDateForInput = (dateString) => {
 
 const Products = () => {
   const [products, setProducts] = useState([]);
+  const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchId, setSearchId] = useState("");
@@ -33,14 +35,20 @@ const Products = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const response = await getAll();
-      const apiResult = response.data;
+      const [productsRes, clientsRes] = await Promise.all([
+        getAll(),
+        getClients()
+      ]);
+      
+      const productsApiResult = productsRes.data;
+      const clientsApiResult = clientsRes.data;
 
-      if (apiResult.success) {
-        setProducts(apiResult.data);
+      if (productsApiResult.success && clientsApiResult.success) {
+        setProducts(productsApiResult.data);
+        setClients(clientsApiResult.data);
       } else {
         setError(
-          apiResult.errorMessage || "Hubo un error al obtener los productos",
+          productsApiResult.errorMessage || clientsApiResult.errorMessage || "Hubo un error al obtener los datos",
         );
       }
     } catch {
@@ -48,6 +56,11 @@ const Products = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const getClientName = (clientId) => {
+    const client = clients.find(c => c.id === clientId);
+    return client ? `${client.firstName} ${client.lastName}` : "Sin cliente";
   };
 
   const openUpdateModal = (product) => {
@@ -258,17 +271,22 @@ const Products = () => {
                       htmlFor="clientId"
                       className="absolute -top-2 left-4 bg-white px-1.5 text-xs font-medium text-slate-900"
                     >
-                      ID del Cliente
+                      Cliente
                     </label>
-                    <input
-                      type="number"
+                    <select
                       id="clientId"
                       name="clientId"
                       value={formData.clientId}
                       onChange={handleChange}
-                      placeholder="Ej. 123"
                       className="block w-full px-4 py-3 text-sm text-slate-900 bg-transparent rounded-md outline-1 -outline-offset-1 outline-slate-300 focus:outline-2 focus:-outline-offset-2 focus:outline-blue-600"
-                    />
+                    >
+                      <option value="">Seleccionar cliente</option>
+                      {clients.map((client) => (
+                        <option key={client.id} value={client.id}>
+                          {client.firstName} {client.lastName} (ID: {client.id})
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
 
@@ -474,17 +492,22 @@ const Products = () => {
                   htmlFor="updateClientId"
                   className="absolute -top-2 left-4 bg-white px-1.5 text-xs font-medium text-slate-900"
                 >
-                  ID del Cliente
+                  Cliente
                 </label>
-                <input
-                  type="number"
+                <select
                   id="updateClientId"
                   name="clientId"
                   value={formData.clientId}
                   onChange={handleChange}
-                  placeholder="Ej. 123"
                   className="block w-full px-4 py-3 text-sm text-slate-900 bg-transparent rounded-md outline-1 -outline-offset-1 outline-slate-300 focus:outline-2 focus:-outline-offset-2 focus:outline-blue-600"
-                />
+                >
+                  <option value="">Seleccionar cliente</option>
+                  {clients.map((client) => (
+                    <option key={client.id} value={client.id}>
+                      {client.firstName} {client.lastName} (ID: {client.id})
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
@@ -599,7 +622,7 @@ const Products = () => {
                     Fecha de Compra
                   </th>
                   <th scope="col" className="px-4 py-3.5">
-                    ID Cliente
+                    Cliente
                   </th>
                   <th scope="col" className="px-4 py-3.5">
                     Creado el
@@ -654,7 +677,7 @@ const Products = () => {
                       </td>
 
                       <td className="px-4 py-4 text-slate-800 whitespace-nowrap">
-                        {product.clientId || "Sin cliente"}
+                        {getClientName(product.clientId)}
                       </td>
 
                       <td className="px-4 py-4 text-slate-800 whitespace-nowrap">
