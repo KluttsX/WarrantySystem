@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { getAll, create, remove, update } from "../services/warrantyService";
 import { getAll as getProducts } from "../services/productService";
+import { getAll as getClients } from "../services/clientService";
 
 const formatDate = (dateString) => {
   if (!dateString || dateString === "0001-01-01T00:00:00") return "Pendiente";
@@ -42,6 +43,7 @@ const normalizeStatus = (status) => {
 const Warranties = () => {
   const [warranties, setWarranties] = useState([]);
   const [products, setProducts] = useState([]);
+  const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchId, setSearchId] = useState("");
@@ -52,20 +54,23 @@ const Warranties = () => {
   const fetchWarranties = async () => {
     try {
       setLoading(true);
-      const [warrantiesRes, productsRes] = await Promise.all([
+      const [warrantiesRes, productsRes, clientsRes] = await Promise.all([
         getAll(),
-        getProducts()
+        getProducts(),
+        getClients()
       ]);
       
       const warrantiesApiResult = warrantiesRes.data;
       const productsApiResult = productsRes.data;
+      const clientsApiResult = clientsRes.data;
 
-      if (warrantiesApiResult.success && productsApiResult.success) {
+      if (warrantiesApiResult.success && productsApiResult.success && clientsApiResult.success) {
         setWarranties(warrantiesApiResult.data);
         setProducts(productsApiResult.data);
+        setClients(clientsApiResult.data);
       } else {
         setError(
-          warrantiesApiResult.errorMessage || productsApiResult.errorMessage || "Hubo un error al obtener los datos",
+          warrantiesApiResult.errorMessage || productsApiResult.errorMessage || clientsApiResult.errorMessage || "Hubo un error al obtener los datos",
         );
       }
     } catch {
@@ -78,6 +83,14 @@ const Warranties = () => {
   const getProductName = (productId) => {
     const product = products.find(p => p.id === productId);
     return product ? product.name : `Producto #${productId}`;
+  };
+
+  const getClientName = (productId) => {
+    const product = products.find(p => p.id === productId);
+    if (!product || !product.clientId) return "Sin cliente";
+    
+    const client = clients.find(c => c.id === product.clientId);
+    return client ? `${client.firstName} ${client.lastName}` : `Cliente #${product.clientId}`;
   };
 
   const openUpdateModal = (warranty) => {
@@ -108,8 +121,10 @@ const Warranties = () => {
 
   const filteredWarranties = warranties.filter((warranty) => {
     const productName = getProductName(warranty.productId).toLowerCase();
+    const clientName = getClientName(warranty.productId).toLowerCase();
     return (
       productName.includes(searchTerm) ||
+      clientName.includes(searchTerm) ||
       warranty.status?.toLowerCase().includes(searchTerm) ||
       warranty.id?.toString().includes(searchTerm)
     );
@@ -154,6 +169,7 @@ const Warranties = () => {
                 {normalizeStatus(viewModal.status)}
               </span>
               <span className="text-sm text-gray-500">{getProductName(viewModal.productId)}</span>
+              <span className="text-sm text-gray-500">{getClientName(viewModal.productId)}</span>
             </div>
 
             <div className="bg-gray-50 rounded-lg p-4">
@@ -626,7 +642,7 @@ const Warranties = () => {
             type="search"
             id="search"
             value={searchId}
-            placeholder="Buscar por ID, Producto o Estado..."
+            placeholder="Buscar por ID, Producto, Cliente o Estado..."
             className="text-sm text-slate-900 w-full outline-none"
             onChange={(e) => setSearchId(e.target.value)}
           />
@@ -671,6 +687,9 @@ const Warranties = () => {
                     Producto
                   </th>
                   <th scope="col" className="px-4 py-3.5">
+                    Cliente
+                  </th>
+                  <th scope="col" className="px-4 py-3.5">
                     Fecha de Inicio
                   </th>
                   <th scope="col" className="px-4 py-3.5">
@@ -697,13 +716,13 @@ const Warranties = () => {
               <tbody className="text-sm divide-y divide-slate-200">
                 {warranties.length === 0 ? (
                   <tr>
-                    <td colSpan="9" className="p-4 text-center text-gray-500">
+                    <td colSpan="10" className="p-4 text-center text-gray-500">
                       No hay garantías registradas.
                     </td>
                   </tr>
                 ) : filteredWarranties.length === 0 ? (
                   <tr>
-                    <td colSpan="9" className="p-4 text-center text-gray-500">
+                    <td colSpan="10" className="p-4 text-center text-gray-500">
                       No se encontraron resultados para "{searchId}"
                     </td>
                   </tr>
@@ -716,6 +735,10 @@ const Warranties = () => {
 
                       <td className="px-4 py-4 text-slate-800 whitespace-nowrap">
                         {getProductName(warranty.productId)}
+                      </td>
+
+                      <td className="px-4 py-4 text-slate-800 whitespace-nowrap">
+                        {getClientName(warranty.productId)}
                       </td>
 
                       <td className="px-4 py-4 text-slate-800 whitespace-nowrap">

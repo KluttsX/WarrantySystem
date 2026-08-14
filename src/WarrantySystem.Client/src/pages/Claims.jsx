@@ -266,7 +266,17 @@ const Claims = () => {
 
       try {
         setIsSubmitting(true);
-        const response = await create(formData);
+        
+        const dataToSend = {
+          warrantyId: Number(formData.warrantyId),
+          claimDate: formData.claimDate,
+          issueDescription: formData.issueDescription,
+          status: formData.status,
+          resolutionDate: formData.resolutionDate || null,
+          resolutionDetails: formData.resolutionDetails || null,
+        };
+        
+        const response = await create(dataToSend);
         const apiResult = response.data;
 
         if (apiResult.success) {
@@ -495,7 +505,7 @@ const Claims = () => {
           status: normalizedStatus,
           resolutionDate: selectedClaim.resolutionDate 
             ? formatDateForInput(selectedClaim.resolutionDate)
-            : getCurrentDate(),
+            : "",
           resolutionDetails: selectedClaim.resolutionDetails || "",
         });
       }
@@ -516,7 +526,17 @@ const Claims = () => {
       e.preventDefault();
       try {
         setIsSubmitting(true);
-        await update(selectedClaim.id, formData);
+        
+        const dataToSend = {
+          warrantyId: Number(formData.warrantyId),
+          claimDate: formData.claimDate,
+          issueDescription: formData.issueDescription,
+          status: formData.status,
+          resolutionDate: formData.resolutionDate || null,
+          resolutionDetails: formData.resolutionDetails || null,
+        };
+        
+        await update(selectedClaim.id, dataToSend);
         closeModal();
         await fetchClaims();
       } catch {
