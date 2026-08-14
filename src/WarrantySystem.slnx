@@ -1,0 +1,27 @@
+<Solution>
+  <Project Path="WarrantySystem.API/WarrantySystem.API.csproj" />
+  <Project Path="WarrantySystem.Application/WarrantySystem.Application.csproj" Id="7e06dd02-9416-4fde-8bfe-7ba462b7e95e" />
+  <Project Path="WarrantySystem.Client/" Type="Website" DisplayName="WarrantySystem.Client">
+    <BuildType Project="Debug" />
+    <Properties Name="WebsiteProperties">
+      <Property Name="Debug.AspNetCompiler.Debug" Value="&quot;True&quot;" />
+      <Property Name="Debug.AspNetCompiler.FixedNames" Value="&quot;false&quot;" />
+      <Property Name="Debug.AspNetCompiler.ForceOverwrite" Value="&quot;true&quot;" />
+      <Property Name="Debug.AspNetCompiler.PhysicalPath" Value="&quot;WarrantySystem.Client\&quot;" />
+      <Property Name="Debug.AspNetCompiler.TargetPath" Value="&quot;PrecompiledWeb\localhost_49671\&quot;" />
+      <Property Name="Debug.AspNetCompiler.Updateable" Value="&quot;true&quot;" />
+      <Property Name="Debug.AspNetCompiler.VirtualPath" Value="&quot;/localhost_49671&quot;" />
+      <Property Name="Release.AspNetCompiler.Debug" Value="&quot;False&quot;" />
+      <Property Name="Release.AspNetCompiler.FixedNames" Value="&quot;false&quot;" />
+      <Property Name="Release.AspNetCompiler.ForceOverwrite" Value="&quot;true&quot;" />
+      <Property Name="Release.AspNetCompiler.PhysicalPath" Value="&quot;WarrantySystem.Client\&quot;" />
+      <Property Name="Release.AspNetCompiler.TargetPath" Value="&quot;PrecompiledWeb\localhost_49671\&quot;" />
+      <Property Name="Release.AspNetCompiler.Updateable" Value="&quot;true&quot;" />
+      <Property Name="Release.AspNetCompiler.VirtualPath" Value="&quot;/localhost_49671&quot;" />
+      <Property Name="TargetFrameworkMoniker" Value="&quot;.NETFramework,Version%3Dv4.8&quot;" />
+      <Property Name="VWDPort" Value="&quot;49671&quot;" />
+    </Properties>
+  </Project>
+  <Project Path="WarrantySystem.Domain/WarrantySystem.Domain.csproj" Id="724e9d1f-50cd-449e-9381-ca6382c147da" />
+  <Project Path="WarrantySystem.Infraestructure/WarrantySystem.Infraestructure.csproj" Id="0b5377be-8e47-4ea7-bb9a-7e9df5744325" />
+</Solution>
